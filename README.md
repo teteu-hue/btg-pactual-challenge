@@ -14,10 +14,10 @@ Criar um microserviço que consome pedidos de um tópico Kafka e os armazena no 
 
 **⏱️ Duração: 4 horas**
 
-- [ ] Definir arquitetura geral:
+- [X] Definir arquitetura geral:
   - Kafka com **1 tópico** chamado `pedidos`, particionado por `codigoCliente`
   - MongoDB com **uma única coleção** chamada `pedidos`
-- [ ] Escolher tecnologias:
+- [X] Escolher tecnologias:
   - Node.js + TypeScript
   - KafkaJS
   - Mongoose
