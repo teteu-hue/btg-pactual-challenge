@@ -1,25 +1,20 @@
-import { criarTopico } from "../config/kafka/KafkaConfig";
-import { createProducer, disconnectProducer } from "../config/kafka/Producer/ProducerConfig"
+import ProducerService from "./ProducerService";
+import {Message} from "kafkajs";
 
-export default class OrderService {
+class OrderService {
+    constructor(
+        private producerService: ProducerService
+    ) {}
 
-    sendMessage = async () => {
-        const producer = await createProducer();
-
+    sendToKafka = async (topicName: string, message: Message) => {
         try {
-            await criarTopico('teste');
-            await producer.send({
-                topic: 'teste',
-                messages: [
-                    { value: JSON.stringify({mensagem: "Hello world!"}) },
-                    { value: JSON.stringify({mensagem: "Olá, Kafka!"}) }
-                ]
-            });
-            return true;
-        } catch(error) {
-            console.error('Erro ao enviar mensagem: ', error);
-        } finally {
-            await disconnectProducer(producer);
+            await this.producerService.ProduceMessage(topicName, message);
+        } catch (e) {
+            console.error(e);
         }
-    }
+
+    };
 }
+
+const orderService = new OrderService(new ProducerService());
+export {orderService};
