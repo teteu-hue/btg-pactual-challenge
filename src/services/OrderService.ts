@@ -10,7 +10,7 @@ class OrderService {
         try {
             await this.producerService.ProduceMessage(topicName, message);
         } catch (e) {
-            console.error(e);
+            throw new Error(`ORDER SERVICE ERROR => ${e ? console.log(e) : 'Error'}`);
         }
 
     };

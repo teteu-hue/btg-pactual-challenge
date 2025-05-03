@@ -23,7 +23,11 @@ export default class ProducerService {
             return;
 
         } catch (error) {
-            throw new Error("Erro ao enviar a mensagem para o Kafka: " + error.message);
+            if (error instanceof Error) {
+                throw new Error("Erro ao enviar a mensagem para o Kafka: " + error.message);
+            } else {
+                throw new Error("Erro ao enviar a mensagem para o Kafka: " + String(error));
+            }
         } finally {
             await disconnectProducer(producer);
         }
