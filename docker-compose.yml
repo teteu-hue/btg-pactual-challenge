@@ -29,7 +29,9 @@ services:
       networks:
       - kafka-network
     mongodb:
-      image: mongo:4.4
+      build:
+        context: .
+        dockerfile: Dockerfile.mongosh
       container_name: mongodb
       ports:
         - "27017:27017"

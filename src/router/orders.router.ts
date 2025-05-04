@@ -1,8 +1,9 @@
-import { Router } from 'express';
+import { Application, Router } from 'express';
 import OrderController from '../controller/webhooks/OrderController';
 
-const orderRouter = Router();
+const orderRouter: Router = Router();
 
-orderRouter.post('/webhook/orders', OrderController.handle);
+orderRouter.post('/orders/getAll', OrderController.test);
+orderRouter.post('/webhook/orders', OrderController.index);
 
 export default orderRouter;

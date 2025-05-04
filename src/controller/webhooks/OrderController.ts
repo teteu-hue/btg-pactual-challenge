@@ -1,8 +1,10 @@
 import { Response, Request } from "express";
 import { orderService } from "../../services/OrderService";
 import { Message } from "kafkajs";
+import { Order } from "../../model/pedido/Order";
+import { orderRepository } from "../../repository/OrderRepository";
 
-async function handle(req: Request, res: Response) {
+async function index(req: Request, res: Response) {
   const topicName: string | null = req.body.topicName;
   const messages: Message[] = req.body.messages;
 
@@ -46,4 +48,31 @@ async function handle(req: Request, res: Response) {
   }
 }
 
-export default { handle };
+async function test(req: Request, res: Response) {
+  const order: Order = req.body.bodyOrder;
+  
+  try {
+    const created_order = await orderRepository.create(order);
+
+    if(!created_order) {
+      return res.status(400).json({
+        success: false,
+        message: "A error happens in OrderDatabaseCreated!"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Order created with success!",
+      data: created_order
+    });
+
+  } catch(e) {
+    return res.status(500).json({
+      status: false,
+      message: "A Unknown error happens! Please check the logs."
+    });
+  }
+}
+
+export default { index, test };

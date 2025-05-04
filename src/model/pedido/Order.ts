@@ -1,14 +1,16 @@
 export interface OrderItem {
-    produto: string;
-    quantidade: number;
-    preco: number
+    product: string;
+    quantity: number;
+    price: number
 }
 
 export interface Order {
     _id?: string;
-    codigoPedido: number;
-    codigoCliente: number;
-    itens: OrderItem[];
+    orderID: number;
+    clientID: number;
+    grossValue: number;
+    items: OrderItem[];
+    created_at: string;
     createdAt?: string;
     updatedAt?: string;
 }
