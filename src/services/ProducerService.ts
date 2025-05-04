@@ -18,8 +18,6 @@ export default class ProducerService {
                 topic: topicName,
                 messages: [data]
             });
-
-            console.log(`Mensagens enviadas para o tópico ${topicName}: `, data);
             return;
 
         } catch (error) {
