@@ -44,8 +44,8 @@ Criar um microserviço que consome pedidos de um tópico Kafka e os armazena no 
 
 **⏱️ Duração: 8 horas**
 
-- [ ] Conectar ao tópico `pedidos` usando KafkaJS
-- [ ] Configurar o consumidor com partições e chave (`codigoCliente`)
+- [X] Conectar ao tópico `pedidos` usando KafkaJS
+- [X] Configurar o consumidor com partições e chave (`codigoCliente`)
 - [ ] Processar a mensagem e calcular o `valorTotal`
 - [ ] Salvar a mensagem no MongoDB:
   ```json
@@ -67,8 +67,8 @@ Criar um microserviço que consome pedidos de um tópico Kafka e os armazena no 
 
 **⏱️ Duração: 4 horas**
 
-- [ ] Criar o schema do pedido (Mongoose)
-- [ ] Utilizar uma única coleção `pedidos`
+- [x] Criar o schema do pedido (Mongoose)
+- [x] Utilizar uma única coleção `pedidos`
 
 ---
 

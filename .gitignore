@@ -1,5 +1,5 @@
-./node_nodules
-./dist
+node_nodules
+dist
 
 # Visual studio code
 .vscode
