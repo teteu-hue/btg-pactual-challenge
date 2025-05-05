@@ -1,8 +1,8 @@
 import { Response, Request } from "express";
-import { orderService } from "../../services/OrderService";
 import { Message } from "kafkajs";
 import { Order } from "../../model/pedido/Order";
 import { orderRepository } from "../../repository/OrderRepository";
+import kafkaMessageDispatcher from "config/kafka/KafkaMessageDispatcher";
 
 async function index(req: Request, res: Response) {
   const topicName: string | null = req.body.topicName;
@@ -22,7 +22,7 @@ async function index(req: Request, res: Response) {
   }
   try {
     for (const message of messages) {
-      await orderService.sendToKafka(topicName, {
+      await kafkaMessageDispatcher.dispatch(topicName, {
         ...message,
         value: JSON.stringify(message.value),
       });

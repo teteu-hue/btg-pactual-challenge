@@ -1,6 +1,7 @@
 import { createProducer, disconnectProducer } from "../config/kafka/Producer/ProducerConfig"
-import { Message } from "kafkajs";
+import { KafkaJSConnectionError, KafkaJSRequestTimeoutError, Message, Producer } from "kafkajs";
 import { criarTopico } from "../config/kafka/KafkaConfig";
+import KafkaMessageError from "config/kafka/error/KafkaMessageError";
 
 export default class ProducerService {
     /**
@@ -10,7 +11,7 @@ export default class ProducerService {
      * @returns boolean
      */
     ProduceMessage = async (topicName: string, data: Message) => {
-        const producer = await createProducer();
+        const producer: Producer = await createProducer();
 
         try {
             await criarTopico(topicName);
@@ -20,14 +21,26 @@ export default class ProducerService {
             });
             return;
 
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error("Erro ao enviar a mensagem para o Kafka: " + error.message);
-            } else {
-                throw new Error("Erro ao enviar a mensagem para o Kafka: " + String(error));
-            }
+        } catch (error) {         
+            await this.handleErrors(error, topicName, producer, data);
+
         } finally {
             await disconnectProducer(producer);
+        }
+    }
+
+    async handleErrors(e: unknown, topicName: string, producer: Producer, data: Message){
+        switch(e) {
+            case e instanceof KafkaJSRequestTimeoutError:
+                setTimeout(() => 30000);
+                await criarTopico(topicName);
+                await producer.send({
+                    topic: topicName,
+                    messages: [data]
+                });
+                return "TimeOut resolved!";
+            default:
+                throw new KafkaMessageError("Erro ao produzir mensagem: " + e);
         }
     }
 }
