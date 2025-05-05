@@ -1,2 +1,8 @@
 ./node_nodules
 ./dist
+
+# Visual studio code
+.vscode
+
+# Jet brains
+.idea
