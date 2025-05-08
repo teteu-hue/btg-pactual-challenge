@@ -1,7 +1,7 @@
-import { createProducer, disconnectProducer } from "../config/kafka/Producer/ProducerConfig"
+import { createProducer, disconnectProducer } from "./kafka/Producer/ProducerConfig"
 import { KafkaJSConnectionError, KafkaJSRequestTimeoutError, Message, Producer } from "kafkajs";
-import { criarTopico } from "../config/kafka/KafkaConfig";
-import KafkaMessageError from "config/kafka/error/KafkaMessageError";
+import { criarTopico } from "./kafka/KafkaConfig";
+import KafkaMessageError from "./kafka/error/KafkaMessageError";
 
 export default class ProducerService {
     /**
