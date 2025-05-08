@@ -1,13 +1,18 @@
-import { create } from "axios";
+import { IValueMessagePayload } from "@src/Interface/DomainInterfaces";
 import {
   createConsumer,
   disconnectConsumer,
 } from "../Consumer/ConsumerConfig";
 import { Consumer, Message } from "kafkajs";
+import { OrderRepository } from "@src/repository/OrderRepository";
 
 export default class ConsumerService {
   private consumer: Consumer | null = null;
   private isRunning: boolean = false;
+
+  constructor(
+    private orderRepository: OrderRepository
+  ) {}
 
   DisconnectActualConsumer = async() => {
     if (this.consumer) {
@@ -30,19 +35,25 @@ export default class ConsumerService {
 
         await this.consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
-                try {
-                    console.log("Message consumed!: ");
-                    console.log({
-                        topic,
-                        partition,
-                        offset: message.offset,
-                        key: message.key?.toString(),
-                        value: message.value?.toString(),
-                        headers: message.headers
-                    });
-                } catch (err) {
-                    console.error("Erro ao processar mensagem:", err);
-                }
+              
+              const order: IValueMessagePayload = message.value ? JSON.parse(message.value.toString()) : '';
+              if(!order) {
+                return;
+              }
+              
+              if(order.status_order !== "paid") {
+                return;
+              }
+              try {
+
+                  const createdOrder = await this.orderRepository.create(order);
+                  if(createdOrder) {
+                    console.log("Dados persistidos para o banco de dados!");
+                  }
+
+              } catch (err) {
+                  console.error("Erro ao processar mensagem:", err);
+              }
             }
         });
         console.log("Consumer conectado e rodando!");

@@ -1,5 +1,5 @@
 import { Message } from "kafkajs";
-import ProducerService from "../../services/ProducerService";
+import ProducerService from "./services/ProducerService";
 import KafkaMessageError from "./error/KafkaMessageError";
 
 class KafkaMessageDispatcher {

@@ -3,21 +3,22 @@ export interface IProducerMessagePayload {
     messages: IMessagePayload[];
 }
 
-interface IMessagePayload {
+export interface IMessagePayload {
     key: string;
     value: IValueMessagePayload;
     timestamp: string;
 }
 
-interface IValueMessagePayload {
+export interface IValueMessagePayload {
     orderID: number;
     clientID: number;
     grossValue: number;
+    status_order: string;
     items: IItemsMessagePayload[];
     created_at: string;
 }
 
-interface IItemsMessagePayload {
+export interface IItemsMessagePayload {
     product: string;
     quantity: number;
     price: number;
