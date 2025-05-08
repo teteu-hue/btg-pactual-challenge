@@ -2,7 +2,7 @@ import { producerJob } from './cron/producerCron';
 import HelloWorldController from './controller/HelloWorldController';
 import { route, app } from './server';
 import orderRouter from './router/orders.router';
-import ConsumerService from './services/ConsumerService';
+import ConsumerService from './services/kafka/services/ConsumerService';
 
 route.get('/', HelloWorldController.index);
 app.use(orderRouter);

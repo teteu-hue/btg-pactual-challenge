@@ -2,7 +2,7 @@ import { create } from "axios";
 import {
   createConsumer,
   disconnectConsumer,
-} from "./kafka/Consumer/ConsumerConfig";
+} from "../Consumer/ConsumerConfig";
 import { Consumer, Message } from "kafkajs";
 
 export default class ConsumerService {
