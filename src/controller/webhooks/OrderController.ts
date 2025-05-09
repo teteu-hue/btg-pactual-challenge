@@ -3,6 +3,7 @@ import { Message } from "kafkajs";
 import { Order } from "../../model/pedido/Order";
 import { orderRepository } from "../../repository/OrderRepository";
 import kafkaMessageDispatcher from "../../services/kafka/KafkaMessageDispatcher";
+import { IValueMessagePayload } from "@src/Interface/DomainInterfaces";
 
 async function index(req: Request, res: Response) {
   const topicName: string | null = req.body.topicName;
@@ -22,10 +23,16 @@ async function index(req: Request, res: Response) {
   }
   try {
     for (const message of messages) {
+      if(!message.value) {
+        continue; // Implementar posteriormente logs do que foi recebido na mensagem.        
+      }
       await kafkaMessageDispatcher.dispatch(topicName, {
         ...message,
         value: JSON.stringify(message.value),
       });
+      const { orderID, clientID, status_order } = JSON.parse(message.value.toString());
+
+      
     }
     console.log(`Messages were sent successfully!`);
     return res
