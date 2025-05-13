@@ -2,7 +2,7 @@ import { Response, Request } from "express";
 import { Message } from "kafkajs";
 import { Order } from "../../model/pedido/Order";
 import { orderRepository } from "../../repository/OrderRepository";
-import orderService from "@src/services/OrderService";
+import orderService from "../../services/OrderService";
 
 async function index(req: Request, res: Response) {
   const topicName: string | null = req.body.topicName;

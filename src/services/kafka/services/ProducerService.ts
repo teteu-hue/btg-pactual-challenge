@@ -19,7 +19,7 @@ export default class ProducerService {
                 topic: topicName,
                 messages: [data]
             });
-            return;
+            return true;
 
         } catch (error) {         
             await this.handleErrors(error, topicName, producer, data);

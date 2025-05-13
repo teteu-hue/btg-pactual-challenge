@@ -5,7 +5,6 @@ export class OrderRepository {
     create = async (orderData: Order) : Promise<Order> => {
         try {
             const order = await OrderModel.create(orderData);
-            console.log(order);
 
             return order;
         } catch(e) {

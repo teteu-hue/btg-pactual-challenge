@@ -9,7 +9,7 @@ class KafkaMessageDispatcher {
 
     async dispatch(topicName: string, message: Message) {
         try {
-            await this.producerService.ProduceMessage(topicName, message);
+            return await this.producerService.ProduceMessage(topicName, message);
         } catch(e) {
             throw new KafkaMessageError("Falha ao enviar mensagem para o Kafka algum erro ocorreu!", "500");
         }

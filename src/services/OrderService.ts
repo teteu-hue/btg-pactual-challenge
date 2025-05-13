@@ -2,10 +2,13 @@ import { Message } from "kafkajs";
 import { Order } from "../model/pedido/Order";
 import { OrderRepository } from "../repository/OrderRepository";
 import kafkaMessageDispatcher from "./kafka/KafkaMessageDispatcher";
+import { OrderProcessRepository } from "../model/orderProcess/OrderProcessRepository";
+import { OrderProcessStatus, ProcessStatus } from "../model/orderProcess/OrderProcessStatus";
 
 class OrderService {
     constructor(
-        private orderRepository: OrderRepository
+        private orderRepository: OrderRepository,
+        private orderProcessRepository: OrderProcessRepository
     ) { }
 
     createOrder = async (order: Order) => {
@@ -32,8 +35,13 @@ class OrderService {
                     ...message,
                     value: JSON.stringify(message.value),
                 });
-                const { orderID, clientID, status_order } = JSON.parse(message.value.toString());
-                
+                //const { orderID, clientID, status_order } = JSON.parse(message.value.toString());
+                //const orderProcessStatus: OrderProcessStatus = {
+                //    orderID,
+                //    clientID,
+                //    status_order,
+                //    process_status_order: ProcessStatus.PENDING
+                //};
             }
         } catch (e) {
             throw new Error(e instanceof Error ? e.message : 'Unknown error');
@@ -41,5 +49,5 @@ class OrderService {
     }
 }
 
-const orderService = new OrderService(new OrderRepository);
+const orderService = new OrderService(new OrderRepository, new OrderProcessRepository);
 export default orderService;
