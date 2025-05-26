@@ -1,6 +1,7 @@
 services:
     zookeeper:
         image: confluentinc/cp-zookeeper:7.5.0
+        container_name: zookeeper
         environment:
           ZOOKEEPER_CLIENT_PORT: 2181
           ZOOKEEPER_CLIENT_TIME: 2000
@@ -11,6 +12,7 @@ services:
 
     kafka:
       image: confluentinc/cp-kafka:7.5.0
+      container_name: kafka
       depends_on:
         - zookeeper
       ports:
@@ -97,6 +99,7 @@ services:
 
     conduktor-console:
       image: conduktor/conduktor-console:1.33.0
+      container_name: conduktor
       ports:
         - "8080:8080"
       volumes:

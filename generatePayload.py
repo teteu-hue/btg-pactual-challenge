@@ -55,7 +55,7 @@ def gerar_pedido(order_id, client_id, data):
     }
 
 # Função principal para gerar o payload
-def gerar_payload(num_pedidos=1000):
+def gerar_payload(num_pedidos=150):
     # Distribuição de clientes: alguns terão múltiplos pedidos
     # Vamos criar entre 200 e 400 clientes diferentes
     num_clientes = random.randint(200, 400)

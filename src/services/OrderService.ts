@@ -4,6 +4,8 @@ import { OrderRepository } from "../repository/OrderRepository";
 import kafkaMessageDispatcher from "./kafka/KafkaMessageDispatcher";
 import { OrderProcessRepository } from "../model/orderProcess/OrderProcessRepository";
 import { OrderProcessStatus, ProcessStatus } from "../model/orderProcess/OrderProcessStatus";
+import { Log } from "../logger/Log"
+import { LogMeta } from "../logger/LogMeta";
 
 class OrderService {
     constructor(
@@ -25,25 +27,106 @@ class OrderService {
         }
     }
 
-    processOrders = async (topicName: string, messages: Message[]) => {
+    produceOrders = async (topicName: string, messages: Message[]) => {
+        Log.info("Initialize processing orders from topic in OrderService.processOrders");
         try {
             for (const message of messages) {
+                
                 if (!message.value) {
-                    continue; // Implementar posteriormente logs do que foi recebido na mensagem.        
+                    Log.kafkaMessage("Message value is not informed in request!", {
+                        action: "OrderService.processOrders",
+                        createdAt: new Date().toISOString(),
+                        details: {
+                            key: message.key?.toString(),
+                            message: message.value?.toString()
+                        }
+                    });
+                    continue;
                 }
+                
+                const { orderID, clientID, status_order, grossValue, items, created_at } = JSON.parse(JSON.stringify(message.value));
+
+                const order: Order = {
+                    orderID,
+                    clientID,
+                    grossValue,
+                    items,
+                    created_at
+                }
+                
+                const createdOrder = await this.createOrder(order);
+
+                if(!createdOrder) {
+                    const metaLog: LogMeta = {
+                        action: "OrderService.produceOrders",
+                        createdAt: new Date().toISOString(),
+                        success: false,
+                        details: {
+                            orderData: {
+                                orderID,
+                                clientID,
+                                status_order,
+                                grossValue,
+                                items,
+                                created_at
+                            }
+                        }
+                    };
+                    Log.error('Order not created in orderService.produceOrders', metaLog);
+                    continue;
+                }
+
                 await kafkaMessageDispatcher.dispatch(topicName, {
                     ...message,
                     value: JSON.stringify(message.value),
                 });
-                //const { orderID, clientID, status_order } = JSON.parse(message.value.toString());
-                //const orderProcessStatus: OrderProcessStatus = {
-                //    orderID,
-                //    clientID,
-                //    status_order,
-                //    process_status_order: ProcessStatus.PENDING
-                //};
+                
+                const orderProcessStatus: OrderProcessStatus = {
+                    orderID,
+                    clientID,
+                    status_order,
+                    process_status_order: ProcessStatus.PENDING
+                };
+
+                const createdOrderProcessStatus = await this.orderProcessRepository.create(orderProcessStatus);
+
+                if(!createdOrderProcessStatus) {
+                    const metaLog: LogMeta = {
+                        action: "OrderService.produceOrders",
+                        createdAt: new Date().toISOString(),
+                        success: false
+                    };
+                    Log.error('Order process status not created in orderService.produceOrders', metaLog);
+                    continue;
+                };
+
+                const metaLog: LogMeta = {
+                    action: 'OrderService.produceOrders',
+                    createdAt: new Date().toISOString(),
+                    success: true,
+                    details: {
+                        orderData: {
+                            orderID,
+                            clientID,
+                            status_order,
+                            grossValue,
+                            items,
+                            created_at
+                        }
+                    }
+                }
+                Log.info('Order sent to kafka with success in orderService.produceOrders', metaLog);
             }
         } catch (e) {
+            const metaLog: LogMeta =  {
+                action: "OrderService.processOrders",
+                createdAt: new Date().toISOString(),
+                success: false,
+                details: {
+                    error: e instanceof Error ? e.message : 'Unknown error'
+                }
+            }
+            Log.error("Error while processing orders!", metaLog);
             throw new Error(e instanceof Error ? e.message : 'Unknown error');
         }
     }

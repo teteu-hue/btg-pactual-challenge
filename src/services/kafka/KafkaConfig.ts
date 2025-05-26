@@ -2,7 +2,7 @@ import { KafkaConfig, Kafka, logLevel, Partitioners } from 'kafkajs';
 
 const kafkaConfig: KafkaConfig = {
     clientId: 'myApp',
-    brokers: ['btg-pactual-challenge-kafka-1:9092'],
+    brokers: ['kafka:9092'],
     logLevel: logLevel.INFO,
     createPartitioner: Partitioners.LegacyPartitioner,
     retry: {
