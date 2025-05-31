@@ -46,36 +46,6 @@ class OrderService {
                 
                 const { orderID, clientID, status_order, grossValue, items, created_at } = JSON.parse(JSON.stringify(message.value));
 
-                const order: Order = {
-                    orderID,
-                    clientID,
-                    grossValue,
-                    items,
-                    created_at
-                }
-                
-                const createdOrder = await this.createOrder(order);
-
-                if(!createdOrder) {
-                    const metaLog: LogMeta = {
-                        action: "OrderService.produceOrders",
-                        createdAt: new Date().toISOString(),
-                        success: false,
-                        details: {
-                            orderData: {
-                                orderID,
-                                clientID,
-                                status_order,
-                                grossValue,
-                                items,
-                                created_at
-                            }
-                        }
-                    };
-                    Log.error('Order not created in orderService.produceOrders', metaLog);
-                    continue;
-                }
-
                 await kafkaMessageDispatcher.dispatch(topicName, {
                     ...message,
                     value: JSON.stringify(message.value),

@@ -4,9 +4,11 @@ import { route, app } from './server';
 import orderRouter from './router/orders.router';
 import ConsumerService from './services/kafka/services/ConsumerService';
 import { OrderRepository } from './repository/OrderRepository';
+import webhookRouter from './router/webhook.router';
 
 route.get('/', HelloWorldController.index);
 app.use(orderRouter);
+app.use(webhookRouter);
 
 app.listen(3000, () => {
     producerJob.start();
