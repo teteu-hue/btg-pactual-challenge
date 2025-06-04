@@ -1,8 +1,9 @@
 import { Message } from "kafkajs";
 import ProducerService from "./services/ProducerService";
 import KafkaMessageError from "./error/KafkaMessageError";
+import { MessageDispatcherInterface } from "@src/Interface/MessageDispatcherInterface";
 
-class KafkaMessageDispatcher {
+class KafkaMessageDispatcher implements MessageDispatcherInterface {
     constructor(
         private producerService: ProducerService
     ){}
