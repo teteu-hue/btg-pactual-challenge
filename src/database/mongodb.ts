@@ -1,3 +1,4 @@
+import { Log } from '../logger/Log';
 import 'dotenv/config';
 import mongoose from 'mongoose';
 
@@ -15,10 +16,22 @@ export async function openConnection() {
         }
         
         await mongoose.connect(DB_CONN_STRING, options);
-        console.log("Connection has been established");
-    } catch(e) {
+        Log.info("Connection has been established", {
+            action: "MongoDB.openConnection",
+            createdAt: new Date().toISOString(),
+            success: true
+        });
 
-        console.error("MongoDB Connection Error: " + 4);
+    } catch(e) {
+        const error = e instanceof Error ? e.message : "Erro desconhecido!";
+        Log.error("MongoDB Connection Error: ", {
+            action: "MongoDB.openConnection",
+            createdAt: new Date().toISOString(),
+            success: false,
+            details: {
+                error: error
+            }
+        });
         throw new Error("Connection is not established => " + e);
     }
 }
@@ -26,8 +39,21 @@ export async function openConnection() {
 export async function closeConnection() {
     try {
         await mongoose.disconnect();
-        console.log("Connection closed!");
-    } catch(error) {
-        console.error("Error closing MongoDB connection: ", error);
+        Log.info("Connection closed!", {
+            action: "MongoDB.closeConnection",
+            createdAt: new Date().toISOString(),
+            success: true
+        });
+    } catch(e) {
+        const error = e instanceof Error ? e.message : "Erro desconhecido!";
+        Log.error("Error closing MongoDB connection: ", {
+            action: "MongoDB.closeConnection",
+            createdAt: new Date().toISOString(),
+            success: false,
+            details: {
+                error: error
+            }
+        });
+        throw new Error("Error closing MongoDB connection: " + e);
     }
 }

@@ -36,18 +36,47 @@ export default class ConsumerService {
       try {
         await this.DisconnectActualConsumer();
         this.consumer = await createConsumer(groupId, topics);
-        console.log("Consumer conectado e rodando!");
+        Log.info("Consumer conectado e rodando!", {
+          action: "ConsumerService.ConsumeMessage",
+          createdAt: new Date().toISOString(),
+          success: true,
+          details: {
+            groupId: groupId,
+            topics: topics,
+            consumer: this.consumer
+          }
+        });
+
         await this.consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
               
               const order: IValueMessagePayload = message.value ? JSON.parse(message.value.toString()) : '';
               if(!order) {
+                Log.info("Não foi informado um valor no pedido", {
+                  action: "ConsumerService.ConsumeMessage",
+                  createdAt: new Date().toISOString(),
+                  success: true,
+                  details: {
+                    orderData: order,
+                    topic: topic
+                  }
+                });
                 return;
               }
               
               if(order.status_order !== "paid") {
+                Log.info("O pedido não está pago, e não será processado!", {
+                  action: "ConsumerService.ConsumeMessage",
+                  createdAt: new Date().toISOString(),
+                  success: true,
+                  details: {
+                    orderData: order,
+                    topic: topic
+                  }
+                });
                 return;
               }
+
               try {
 
                   const createdOrder = await this.orderRepository.create(order);
@@ -112,10 +141,17 @@ export default class ConsumerService {
         });
         
       } catch(e) {
-        console.warn(e);
+        const error = e instanceof Error ? e.message : "Erro desconhecido!" ;
 
         if(this.isRunning) {
-            console.log("Tentando reconectar em 5 segundos...");
+            Log.error("Ocorreu algum erro de conexão, tentando reconectar no serviço Kafka!", {
+              action: "ConsumerService.ConsumeMessage",
+              createdAt: new Date().toISOString(),
+              success: false,
+              details: {
+                message: error
+              }
+            });
             setTimeout(connect, 5000);
         }
       }
@@ -136,7 +172,11 @@ export default class ConsumerService {
     if(this.consumer) {
         await this.DisconnectActualConsumer();
         this.consumer = null;
-        console.log("Consumer parado manualmente!");
+        Log.info("Consumer parado manualmente", {
+          action: "ConsumerService.stop",
+          createdAt: new Date().toISOString(),
+          success: true
+        });
     }
   }
 }

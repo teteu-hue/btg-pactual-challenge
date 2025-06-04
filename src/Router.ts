@@ -14,6 +14,4 @@ app.use(webhookRouter);
 app.listen(3000, () => {
     producerJob.start();
     new ConsumerService(new OrderRepository, new OrderProcessRepository).ConsumeMessage('my-group', ['orders']).catch(e => console.error(`Error in consumer`));
-    console.log("Server running in the port 3000");
-    console.log("CronJobs is running!");
 });
