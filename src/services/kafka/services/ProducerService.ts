@@ -2,6 +2,7 @@ import { createProducer, disconnectProducer } from "../Producer/ProducerConfig"
 import { KafkaJSConnectionError, KafkaJSRequestTimeoutError, Message, Producer } from "kafkajs";
 import { criarTopico } from "../KafkaConfig";
 import KafkaMessageError from "../error/KafkaMessageError";
+import { Log } from "../../../logger/Log";
 
 export default class ProducerService {
     /**
@@ -12,6 +13,10 @@ export default class ProducerService {
      */
     ProduceMessage = async (topicName: string, data: Message) => {
         const producer: Producer = await createProducer();
+        Log.info("Producer message called!", {
+            action: "ProducerService.ProduceMessage",
+            createdAt: new Date().toISOString()
+        });
 
         try {
             await criarTopico(topicName);
@@ -44,6 +49,3 @@ export default class ProducerService {
         }
     }
 }
-
-// const producerService = new ProducerService();
-// export { producerService };

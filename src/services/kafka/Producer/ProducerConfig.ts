@@ -1,5 +1,6 @@
 import { Producer } from "kafkajs";
 import { kafka } from "../KafkaConfig";
+import { Log } from "../../../logger/Log";
 
 const createProducer = async(): Promise<Producer> => {
     const producer = kafka.producer({
@@ -9,11 +10,21 @@ const createProducer = async(): Promise<Producer> => {
         retry: { retries: 2147483647 }
     });
     await producer.connect();
+    Log.info("Producer connected successfully!", {
+        action: "ProducerConfig.createProducer",
+        createdAt: new Date().toISOString(),
+        success: true
+    });
     return producer;
 }
 
 const disconnectProducer = async(producer: Producer): Promise<void> => {
     await producer.disconnect();
+    Log.info("Producer disconnected successfully!", {
+        action: "ProducerConfig.disconnectProducer",
+        createdAt: new Date().toISOString(),
+        success: true
+    });
 }
 
 export { createProducer, disconnectProducer };
