@@ -8,6 +8,7 @@ import { OrderRepository } from "@src/repository/OrderRepository";
 import { LogMeta } from "../../../logger/LogMeta";
 import { Log } from "../../../logger/Log";
 import { OrderProcessRepository } from "@src/model/orderProcess/OrderProcessRepository";
+import { Encryption } from "../../../encryption/index";
 
 export default class ConsumerService {
   private consumer: Consumer | null = null;
@@ -50,7 +51,7 @@ export default class ConsumerService {
         await this.consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
               
-              const order: IValueMessagePayload = message.value ? JSON.parse(message.value.toString()) : '';
+              const order: IValueMessagePayload = message.value ? JSON.parse(Encryption.decrypt(message.value.toString())) : '';
               if(!order) {
                 Log.info("Não foi informado um valor no pedido", {
                   action: "ConsumerService.ConsumeMessage",
@@ -79,6 +80,7 @@ export default class ConsumerService {
 
               try {
 
+                // Implementar upsert
                   const createdOrder = await this.orderRepository.create(order);
                   if(createdOrder) {
                     const metaLog: LogMeta = {
@@ -109,6 +111,8 @@ export default class ConsumerService {
                     return;
                   }
                   
+                  // Já verifico se o status não tem o status de pago, essa validação é desnecessária.
+                  // Implementar uma nova forma.
                   if(order.status_order === "paid") {
                     await this.orderProcessRepository.updateStatusToProcessed(orderProcess._id);
                     const metaLog: LogMeta = {

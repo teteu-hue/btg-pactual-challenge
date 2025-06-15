@@ -6,7 +6,7 @@ import { OrderProcessRepository } from "../model/orderProcess/OrderProcessReposi
 import { OrderProcessStatus, ProcessStatus } from "../model/orderProcess/OrderProcessStatus";
 import { Log } from "../logger/Log"
 import { LogMeta } from "../logger/LogMeta";
-
+import { Encryption } from "../encryption";
 class OrderService {
     constructor(
         private orderRepository: OrderRepository,
@@ -48,7 +48,7 @@ class OrderService {
 
                 await kafkaMessageDispatcher.dispatch(topicName, {
                     ...message,
-                    value: JSON.stringify(message.value),
+                    value: Encryption.encrypt(JSON.stringify(message.value)),
                 });
                 
                 const orderProcessStatus: OrderProcessStatus = {
@@ -58,6 +58,7 @@ class OrderService {
                     process_status_order: ProcessStatus.PENDING
                 };
 
+                // Implementar upsert.
                 const createdOrderProcessStatus = await this.orderProcessRepository.create(orderProcessStatus);
 
                 if(!createdOrderProcessStatus) {

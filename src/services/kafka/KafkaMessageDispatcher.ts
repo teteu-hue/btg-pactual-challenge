@@ -11,6 +11,7 @@ class KafkaMessageDispatcher implements MessageDispatcherInterface {
 
     async dispatch(topicName: string, message: Message) {
         try {
+            
             await this.producerService.ProduceMessage(topicName, message);
             Log.info("Message dispatched to Kafka successfully!", {
                 action: "KafkaMessageDispatcher.dispatch",
@@ -28,7 +29,7 @@ class KafkaMessageDispatcher implements MessageDispatcherInterface {
                     error: error
                 }
             });
-            throw new KafkaMessageError("Falha ao enviar mensagem para o Kafka algum erro ocorreu!", "500");
+            throw new KafkaMessageError("Falha ao enviar mensagem para o Kafka algum erro ocorreu! =>" + error, "500");
         }
     }
 }

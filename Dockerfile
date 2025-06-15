@@ -10,3 +10,5 @@ COPY . .
 
 # Expondo a porta da aplicação (ajuste conforme necessário)
 EXPOSE 3000
+
+CMD ["npm", 'run', 'dev']

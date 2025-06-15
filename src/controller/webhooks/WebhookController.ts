@@ -53,10 +53,12 @@ async function index(req: Request, res: Response) {
     }
     Log.info("Processing orders from topic: " + topicName, metaLog);
     
-    await orderService.produceOrders(topicName, messages);
-    metaLog.success = true;
+    orderService.produceOrders(topicName, messages).then((success) => {
+      metaLog.success = true;
 
-    Log.info(`Messages were sent successfully!`, metaLog);
+      Log.info(`Messages were sent successfully!`, metaLog);
+    });
+
     return res
       .status(200)
       .json({

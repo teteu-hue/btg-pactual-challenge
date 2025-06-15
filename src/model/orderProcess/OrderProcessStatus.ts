@@ -5,6 +5,7 @@ export enum ProcessStatus {
 }
 
 export interface OrderProcessStatus {
+    _id?: string;
     orderID: number;
     clientID: number;
     status_order: string;

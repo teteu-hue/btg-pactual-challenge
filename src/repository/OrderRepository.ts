@@ -1,5 +1,6 @@
 import OrderModel from "../model/pedido/OrderModel";
 import { Order } from "../model/pedido/Order";
+import { orderSchema } from "@src/model/pedido/OrderSchema";
 
 export class OrderRepository {
     create = async (orderData: Order) : Promise<Order> => {
@@ -42,6 +43,18 @@ export class OrderRepository {
     delete = async(id: string): Promise<boolean> => {
         const result = await OrderModel.deleteOne( {_id: id} ).exec();
         return result.deletedCount === 1;
+    }
+
+    insertIfNotExists = async(orderData: Order): Promise<Array<String | Order>> => {
+        const order = await OrderModel.findOne({_id: orderData._id, clientID: orderData.clientID});
+
+        if(!order) {
+            const newOrder = await this.create(orderData);
+
+            return ['notExists', newOrder];
+        }
+
+        return ['exists', order];
     }
 }
 

@@ -51,7 +51,7 @@ services:
         - /usr/src/app/node_modules
       command: yarn dev
       ports:
-        - "3105:3000"
+        - "3000:3000"
       depends_on:
         - kafka
         - mongodb

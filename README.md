@@ -1,92 +1,85 @@
-# 🛣️ Roadmap do Projeto - Microserviço com Kafka + MongoDB + API REST
+# Kafka Processor Service
 
-## 📌 Objetivo
+Microserviço Node.js + TypeScript para processamento de pedidos via Kafka, persistência no MongoDB e exposição de API REST para consulta de pedidos.
 
-Criar um microserviço que consome pedidos de um tópico Kafka e os armazena no MongoDB, com uma API REST que retorna:
+## 🚀 Tecnologias Utilizadas
+- Node.js (recomendado: versão 18 ou superior)
+- TypeScript
+- Express
+- KafkaJS
+- Mongoose
+- Winston (logs)
+- Docker & Docker Compose
 
-- Valor total do pedido
-- Quantidade de pedidos por cliente
-- Lista de pedidos de um cliente
+## 📦 Instalação e Execução
 
----
+### 1. Pré-requisitos
+- Docker e Docker Compose instalados
+- Node.js **18 ou superior** (obrigatório para rodar testes automatizados)
 
-## ✅ Etapa 1 – Planejamento e Arquitetura
+### 2. Clone o repositório
+```bash
+git clone <url-do-repo>
+cd kafka-processor-service
+```
 
-**⏱️ Duração: 4 horas**
+### 3. Configure o arquivo `.env`
+Crie um arquivo `.env` na raiz do projeto com as variáveis:
+```
+KAFKA_BROKER=kafka:9092
+MONGO_URI=mongodb://mongodb:27017/pedidosdb
+```
 
-- [X] Definir arquitetura geral:
-  - Kafka com **1 tópico** chamado `pedidos`, particionado por `codigoCliente`
-  - MongoDB com **uma única coleção** chamada `pedidos`
-- [X] Escolher tecnologias:
-  - Node.js + TypeScript
-  - KafkaJS
-  - Mongoose
-  - Express
+### 4. Suba os serviços com Docker Compose
+```bash
+docker-compose up --build
+```
+Isso irá subir:
+- Kafka + Zookeeper
+- MongoDB
+- (Opcional) Mongo Express
+- O microserviço Node.js
 
----
+### 5. Rodando localmente (sem Docker)
+1. Instale as dependências:
+   ```bash
+   npm install
+   # ou
+   yarn install
+   ```
+2. Compile o projeto:
+   ```bash
+   npm run build
+   # ou
+   yarn build
+   ```
+3. Inicie o serviço:
+   ```bash
+   npm run dev
+   # ou
+   yarn dev
+   ```
 
-## ⚙️ Etapa 2 – Setup do Ambiente com Docker
+## 🧪 Testes Automatizados
 
-**⏱️ Duração: 4 horas**
-
-- [X] Criar `docker-compose.yml` com:
-  - Kafka + Zookeeper
-  - MongoDB
-  - Mongo Express (opcional)
-  - Aplicação Node rodando automaticamente (`ts-node-dev`)
-- [X] Configurar `.env` com:
-  - `KAFKA_BROKER`
-  - `MONGO_URI=mongodb://mongodb:27017/pedidosdb`
-
----
-
-## 🛠️ Etapa 3 – Desenvolvimento do Microserviço Kafka
-
-**⏱️ Duração: 8 horas**
-
-- [X] Conectar ao tópico `pedidos` usando KafkaJS
-- [X] Configurar o consumidor com partições e chave (`codigoCliente`)
-- [ ] Processar a mensagem e calcular o `valorTotal`
-- [ ] Salvar a mensagem no MongoDB:
-  ```json
-  {
-    "codigoPedido": 1001,
-    "codigoCliente": 1,
-    "valorTotal": 120,
-    "itens": [
-      { "produto": "lápis", "quantidade": 100, "preco": 1.1 },
-      { "produto": "caderno", "quantidade": 10, "preco": 1.0 }
-    ],
-    "dataCriacao": "2025-04-12T12:00:00Z"
-  }
+- Certifique-se de estar usando Node.js 18 ou superior para evitar erros de execução do Jest.
+- Para rodar todos os testes automatizados:
+  ```bash
+  npm test
   ```
+- Para rodar um teste específico:
+  ```bash
+  npx jest src/__tests__/OrderService.test.ts
+  ```
+- Os testes estão localizados em `src/__tests__` e utilizam Jest + ts-jest.
 
----
+## 🛣️ Endpoints da API REST
 
-## 🧩 Etapa 4 – Modelagem do MongoDB
+- `GET /order/quantity/:clienteId` — Quantidade de pedidos por cliente
+- `GET /order/list/:clienteId` — Lista de pedidos de um cliente
+- `GET /order/total/:codigoPedido` — Valor total de um pedido
 
-**⏱️ Duração: 4 horas**
-
-- [x] Criar o schema do pedido (Mongoose)
-- [x] Utilizar uma única coleção `pedidos`
-
----
-
-## 🌐 Etapa 5 – Criação da API REST com Express
-
-**⏱️ Duração: 6 horas**
-
-- [ ] Endpoint: `GET /order/quantity/:clienteId`  
-  → Retorna a quantidade de pedidos por cliente
-
-- [ ] Endpoint: `GET /order/list/:clienteId`  
-  → Retorna a lista de pedidos por cliente
-
-- [ ] Endpoint: `GET /order/total/:codigoPedido`  
-  → Retorna o valor total de um pedido
-
-### 🔁 Exemplo de Respostas
-
+### Exemplos de resposta
 ```json
 // GET /order/quantity/1
 { "clienteId": 1, "quantidadePedidos": 3 }
@@ -104,40 +97,31 @@ Criar um microserviço que consome pedidos de um tópico Kafka e os armazena no 
 { "codigoPedido": 1001, "valorTotal": 120 }
 ```
 
----
+## 🧪 Testes
+- Testes manuais podem ser feitos via Postman/cURL nos endpoints acima.
+- (Opcional) Para rodar testes automatizados, implemente com Jest.
 
-## 🧪 Etapa 6 – Testes e Validação
+## 📂 Estrutura do Projeto
+```
+src/
+  ├── controller/         # Controllers das rotas
+  ├── cron/               # Jobs agendados (ex: producer)
+  ├── database/           # Conexão com MongoDB
+  ├── encryption/         # Utilitários de criptografia
+  ├── Interface/          # Interfaces TypeScript
+  ├── logger/             # Configuração de logs
+  ├── model/              # Schemas e models do Mongoose
+  ├── repository/         # Repositórios de acesso a dados
+  ├── router/             # Definição de rotas
+  ├── services/           # Serviços de negócio e Kafka
+  ├── index.ts            # Ponto de entrada
+```
 
-**⏱️ Duração: 6 horas**
-
-- [ ] Validar consumo do Kafka e persistência no banco
-- [ ] Testar manualmente os endpoints
-- [ ] Criar testes automatizados com Jest (opcional)
-
----
-
-## 📚 Etapa 7 – Documentação e Entrega
-
-**⏱️ Duração: 4 horas**
-
-- [ ] Documentar a API (Swagger opcional)
-- [ ] Criar `README.md` com:
-  - Instruções de setup com Docker
-  - Comandos para testes locais
-
----
-
-## 📊 Resumo Visual
-
-| Etapa        | Tarefa                                | Tempo Estimado |
-|--------------|----------------------------------------|----------------|
-| Planejamento | Arquitetura + tecnologias              | 4h             |
-| Setup        | Docker + .env                          | 4h             |
-| Microserviço | Kafka + consumo                        | 8h             |
-| MongoDB      | Modelagem + persistência               | 4h             |
-| API REST     | Endpoints com Express                  | 6h             |
-| Testes       | Unitários e integração                 | 6h             |
-| Docs         | README + documentação da API           | 4h             |
-| **Total**    |                                        | **36 horas**   |
+## 📝 Observações
+- O serviço consome mensagens do tópico Kafka `pedidos` e armazena no MongoDB.
+- Os endpoints REST permitem consultar os pedidos processados.
+- Logs são gravados via Winston, inclusive no MongoDB.
 
 ---
+
+Contribuições e sugestões são bem-vindas!
