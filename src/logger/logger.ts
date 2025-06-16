@@ -1,4 +1,4 @@
-import { createLogger, transports } from "winston";
+import { createLogger, transports, format } from "winston";
 import "winston-mongodb";
 import 'dotenv/config';
 
@@ -11,7 +11,13 @@ const logger = createLogger({
             options: {
                 useUnifiedTopology: true
             }
-
+        }),
+        new transports.Console({
+            level: 'info',
+            format: format.combine(
+                format.colorize(),
+                format.simple()
+            )
         })
     ]
 });
